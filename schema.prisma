@@ -1,0 +1,61 @@
+// Datasource points to Supabase (set DATABASE_URL in env)
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+generator client { provider = "prisma-client-js" }
+
+model User {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  email        String?  @unique
+  displayName  String?
+  coins        Decimal  @default(0)
+  orders       Order[]
+  redemptions  Redemption[]
+  spins        Spin[]
+  subscriptions Subscription[]
+  wishlist     WishlistItem[]
+}
+
+model Spin {
+  id        String   @id @default(uuid())
+  userId    String
+  createdAt DateTime @default(now())
+  result    String
+  coinsWon  Decimal  @default(0)
+  @@index([userId, createdAt])
+}
+
+model Redemption {
+  id        String   @id @default(uuid())
+  userId    String
+  createdAt DateTime @default(now())
+  amountRs  Decimal
+  coinsUsed Decimal
+  codeType  String
+  status    String   @default("PENDING")
+}
+
+model Subscription {
+  id          String   @id @default(uuid())
+  userId      String
+  plan        String
+  startedAt   DateTime @default(now())
+  expiresAt   DateTime?
+  feePaidRs   Int
+  minCartRs   Int
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  createdAt   DateTime @default(now())
+  totalRs     Int
+  status      String   @default("PLACED")
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+}
